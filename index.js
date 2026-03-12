@@ -16,3 +16,4 @@ server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 // Test SonarQube detection
 var password = "supersecret123";
 eval("console.log('bad code')");
+ 
