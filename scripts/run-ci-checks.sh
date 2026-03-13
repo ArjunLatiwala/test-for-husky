@@ -8,6 +8,32 @@
 # To run manually: sh scripts/run-ci-checks.sh
 # ---------------------------------------------------------------
 
+# ---------------------------------------------------------------
+# Git diff check — only run if actual files changed
+# ---------------------------------------------------------------
+LOCAL=$(git rev-parse @)
+REMOTE=$(git rev-parse @{u} 2>/dev/null)
+
+if [ "$REMOTE" != "" ] && [ "$LOCAL" = "$REMOTE" ]; then
+  echo "[CI Checks] No changes to push. Skipping."
+  exit 0
+fi
+
+if [ "$REMOTE" != "" ]; then
+  CHANGED=$(git diff --name-only "$REMOTE" "$LOCAL" 2>/dev/null)
+else
+  CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null)
+fi
+
+if [ -z "$CHANGED" ]; then
+  echo "[CI Checks] No changed files detected. Skipping."
+  exit 0
+fi
+
+echo ""
+echo "[CI Checks] Changed files detected:"
+echo "$CHANGED" | sed 's/^/  -> /'
+
 echo ""
 echo "[CI Checks] Starting checks..."
 
